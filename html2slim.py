@@ -1,5 +1,5 @@
 import os
-import sublime, sublime_plugin
+import sublime, sublime_plugin, getpass
 
 class HtmlToSlimFromFileCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
@@ -41,9 +41,10 @@ class HtmlToSlimFromClipboardCommand(sublime_plugin.TextCommand):
 class Slim:
 	@classmethod
 	def convert(self, html_file, slim_file):
-		cmd = ' '.join(['/usr/local/bin/rbenv', 'exec', 'erb2slim', html_file, slim_file])
+		rvm_path = "/Users/%(user)s/.rvm/bin/rvm" % {"user":getpass.getuser()}
+		cmd = [rvm_path, 'default', 'do', 'erb2slim', html_file, slim_file]
 		from subprocess import call
-		call(cmd, shell=True)
+		call(cmd)
 		return True
 	
 	@classmethod
@@ -52,7 +53,7 @@ class Slim:
 		slim_file = html_file + ".slim"
 
 		with open(html_file, "w") as tmp_file:
-		  tmp_file.write(html)  
+		  tmp_file.write(html)
 		
 		self.convert(html_file, slim_file)
 		slim = open(slim_file, 'r').read()
